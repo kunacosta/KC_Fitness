@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx prisma *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(npx cap *)",
+      "Bash(npx next *)",
+      "Bash(cp C:/Users/SHADOW_BLADE/.claude/image-cache/3144a7e6-1a9b-41e5-9e61-ffd7360681f0/4.png D:/Projects/kc-fitness/android/app/src/main/res/__TRACKED_VAR__/ic_launcher.png)",
+      "Bash(cp C:/Users/SHADOW_BLADE/.claude/image-cache/3144a7e6-1a9b-41e5-9e61-ffd7360681f0/4.png D:/Projects/kc-fitness/android/app/src/main/res/__TRACKED_VAR__/ic_launcher_round.png)",
+      "Bash(npm list *)",
+      "Bash(magick --version)",
+      "Bash(convert --version)",
+      "Bash(node -e ' *)",
+      "Bash(grep -rn \"text-\\\\[#[0-9a-f]\\\\{3,6\\\\}\\\\]\" D:/Projects/kc-fitness/src --include=\"*.tsx\" --include=\"*.css\")",
+      "Bash(cat capacitor.config.ts)",
+      "Bash(cat capacitor.config.json)",
+      "Bash(npm install *)",
+      "Bash(xargs grep *)",
+      "Bash(xargs cat *)",
+      "Bash(xargs ls *)",
+      "Bash(npm info *)",
+      "Bash(npm uninstall *)",
+      "mcp__claude_ai_Canva__generate-design",
+      "Bash(npx patch-package *)",
+      "Bash(node *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(gh auth *)"
+    ]
+  }
+}

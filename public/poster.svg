@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a0a0a"/>
+      <stop offset="100%" stop-color="#0f0f0f"/>
+    </linearGradient>
+    <linearGradient id="emeraldGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1a1a"/>
+      <stop offset="100%" stop-color="#111111"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="40" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1080" height="1920" fill="url(#bgGrad)"/>
+
+  <!-- Subtle emerald radial glow top -->
+  <ellipse cx="540" cy="480" rx="500" ry="380" fill="#10b981" opacity="0.045"/>
+
+  <!-- Top label -->
+  <text x="540" y="108" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="22" fill="#10b981" text-anchor="middle" letter-spacing="10" opacity="0.9">INTRODUCING</text>
+
+  <!-- ── App Icon block ── -->
+  <rect x="390" y="148" width="300" height="300" rx="64" fill="#000000"/>
+  <rect x="390" y="148" width="300" height="300" rx="64" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.08"/>
+  <!-- K letter -->
+  <rect x="435" y="195" width="34" height="206" fill="white"/>
+  <polygon points="469,280 556,195 590,195 503,280" fill="white"/>
+  <polygon points="469,307 503,307 590,401 556,401" fill="white"/>
+  <!-- C letter -->
+  <rect x="612" y="195" width="33" height="206" fill="white"/>
+  <rect x="645" y="195" width="33" height="34" fill="white"/>
+  <rect x="645" y="367" width="33" height="34" fill="white"/>
+  <!-- Emerald accent bar -->
+  <rect x="435" y="415" width="243" height="5" rx="2.5" fill="#10b981" opacity="0.85"/>
+
+  <!-- App name -->
+  <text x="540" y="538" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="96" fill="white" text-anchor="middle" letter-spacing="-2">KC FITNESS</text>
+
+  <!-- Tagline -->
+  <text x="540" y="602" font-family="Arial, sans-serif" font-weight="400" font-size="28" fill="#10b981" text-anchor="middle" letter-spacing="3" opacity="0.95">TRAIN SMARTER. GET STRONGER.</text>
+
+  <!-- Divider -->
+  <rect x="440" y="638" width="200" height="1.5" rx="1" fill="#10b981" opacity="0.35"/>
+
+  <!-- ── Subtitle ── -->
+  <text x="540" y="700" font-family="Arial, sans-serif" font-weight="400" font-size="30" fill="#aaaaaa" text-anchor="middle">Your personal progressive overload tracker.</text>
+
+  <!-- ── Mockup phone frame ── -->
+  <rect x="240" y="760" width="600" height="680" rx="52" fill="#111111" stroke="#ffffff" stroke-width="1.2" stroke-opacity="0.1"/>
+  <!-- Status bar dots -->
+  <circle cx="480" cy="788" r="5" fill="#333"/>
+  <circle cx="540" cy="788" r="5" fill="#333"/>
+  <circle cx="600" cy="788" r="5" fill="#333"/>
+  <!-- Screen content - workout log mock -->
+  <rect x="264" y="810" width="552" height="600" rx="30" fill="#0a0a0a"/>
+
+  <!-- Mock header -->
+  <text x="310" y="862" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="18" fill="white">KC</text>
+  <text x="344" y="862" font-family="Arial, sans-serif" font-size="18" fill="#666">/ Log workout</text>
+
+  <!-- Mock exercise card 1 -->
+  <rect x="284" y="882" width="512" height="120" rx="20" fill="#111111" stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.08"/>
+  <text x="308" y="912" font-family="Arial, sans-serif" font-weight="700" font-size="16" fill="white">Bench Press</text>
+  <text x="308" y="932" font-family="Arial, sans-serif" font-size="12" fill="#666" letter-spacing="2">WEIGHT · REPS</text>
+  <rect x="308" y="950" width="136" height="36" rx="10" fill="#161616"/>
+  <text x="376" y="973" font-family="Arial, sans-serif" font-weight="700" font-size="14" fill="white" text-anchor="middle">62.5 kg</text>
+  <rect x="456" y="950" width="100" height="36" rx="10" fill="#161616"/>
+  <text x="506" y="973" font-family="Arial, sans-serif" font-weight="700" font-size="14" fill="white" text-anchor="middle">10 reps</text>
+  <rect x="568" y="950" width="80" height="36" rx="10" fill="#161616"/>
+  <text x="608" y="973" font-family="Arial, sans-serif" font-weight="700" font-size="12" fill="#aaa" text-anchor="middle">RIR 2</text>
+
+  <!-- Mock progression snapshot -->
+  <rect x="284" y="1016" width="512" height="80" rx="20" fill="#10b981" fill-opacity="0.08" stroke="#10b981" stroke-width="0.8" stroke-opacity="0.2"/>
+  <text x="308" y="1044" font-family="Arial, sans-serif" font-size="11" fill="#10b981" letter-spacing="2">NEXT TARGET</text>
+  <text x="308" y="1070" font-family="Arial, sans-serif" font-weight="700" font-size="18" fill="white">65 kg · 8–12 reps</text>
+  <text x="680" y="1070" font-family="Arial, sans-serif" font-size="12" fill="#10b981" text-anchor="end">Increase weight ↑</text>
+
+  <!-- Mock chart area -->
+  <rect x="284" y="1110" width="512" height="130" rx="20" fill="#111111" stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.08"/>
+  <text x="308" y="1138" font-family="Arial, sans-serif" font-size="11" fill="#999" letter-spacing="2">PROGRESSION TREND</text>
+  <!-- Chart line (simplified) -->
+  <polyline points="308,1218 358,1200 408,1190 458,1182 508,1170 558,1158 608,1148 658,1135 708,1122 758,1110" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  <circle cx="758" cy="1110" r="5" fill="#10b981"/>
+  <!-- Chart grid lines -->
+  <line x1="308" y1="1218" x2="758" y2="1218" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.06"/>
+  <line x1="308" y1="1184" x2="758" y2="1184" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.06"/>
+  <line x1="308" y1="1150" x2="758" y2="1150" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.06"/>
+
+  <!-- ── Feature pills ── -->
+  <g transform="translate(0, 1490)">
+    <!-- Row 1 -->
+    <rect x="152" y="0" width="260" height="56" rx="28" fill="#111111" stroke="#ffffff" stroke-width="1" stroke-opacity="0.1"/>
+    <circle cx="185" cy="28" r="10" fill="#10b981" opacity="0.2"/>
+    <circle cx="185" cy="28" r="5" fill="#10b981"/>
+    <text x="204" y="33" font-family="Arial, sans-serif" font-size="20" fill="#dddddd">Progressive overload</text>
+
+    <rect x="432" y="0" width="220" height="56" rx="28" fill="#111111" stroke="#ffffff" stroke-width="1" stroke-opacity="0.1"/>
+    <circle cx="465" cy="28" r="10" fill="#10b981" opacity="0.2"/>
+    <circle cx="465" cy="28" r="5" fill="#10b981"/>
+    <text x="484" y="33" font-family="Arial, sans-serif" font-size="20" fill="#dddddd">100% offline</text>
+
+    <!-- Row 2 -->
+    <rect x="200" y="72" width="224" height="56" rx="28" fill="#111111" stroke="#ffffff" stroke-width="1" stroke-opacity="0.1"/>
+    <circle cx="233" cy="100" r="10" fill="#10b981" opacity="0.2"/>
+    <circle cx="233" cy="100" r="5" fill="#10b981"/>
+    <text x="252" y="105" font-family="Arial, sans-serif" font-size="20" fill="#dddddd">Smart analytics</text>
+
+    <rect x="440" y="72" width="202" height="56" rx="28" fill="#111111" stroke="#ffffff" stroke-width="1" stroke-opacity="0.1"/>
+    <circle cx="473" cy="100" r="10" fill="#10b981" opacity="0.2"/>
+    <circle cx="473" cy="100" r="5" fill="#10b981"/>
+    <text x="492" y="105" font-family="Arial, sans-serif" font-size="20" fill="#dddddd">Free forever</text>
+  </g>
+
+  <!-- Bottom accent bar -->
+  <rect x="152" y="1694" width="776" height="2" rx="1" fill="#10b981" opacity="0.25"/>
+
+  <!-- Bottom text -->
+  <text x="540" y="1752" font-family="Arial, sans-serif" font-size="22" fill="#555555" text-anchor="middle" letter-spacing="1">Available on Android</text>
+  <text x="540" y="1790" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="#333333" text-anchor="middle" letter-spacing="8">AI.KCFITNESS.APP</text>
+
+  <!-- Corner emerald accents -->
+  <rect x="0" y="0" width="6" height="120" fill="#10b981" opacity="0.6"/>
+  <rect x="0" y="0" width="120" height="6" fill="#10b981" opacity="0.6"/>
+  <rect x="1074" y="0" width="6" height="120" fill="#10b981" opacity="0.6"/>
+  <rect x="960" y="0" width="120" height="6" fill="#10b981" opacity="0.6"/>
+  <rect x="0" y="1800" width="6" height="120" fill="#10b981" opacity="0.6"/>
+  <rect x="0" y="1914" width="120" height="6" fill="#10b981" opacity="0.6"/>
+  <rect x="1074" y="1800" width="6" height="120" fill="#10b981" opacity="0.6"/>
+  <rect x="960" y="1914" width="120" height="6" fill="#10b981" opacity="0.6"/>
+</svg>

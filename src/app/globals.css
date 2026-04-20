@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+/* ── Design tokens ────────────────────────────────────────────────────────── */
+:root {
+  --bg:        #0a0a0a;
+  --card:      #111111;
+  --card-2:    #161616;
+  --border:    rgba(255,255,255,0.08);
+  --border-2:  rgba(255,255,255,0.12);
+  --txt:       #ffffff;
+  --txt-2:     #bbbbbb;
+  --txt-3:     #888888;
+  --txt-4:     #555555;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--txt);
+  --font-sans: var(--font-plus-jakarta-sans);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input, select, textarea {
+  outline: none;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 1px solid rgba(255,255,255,0.18);
+  outline-offset: 0;
+}
+
+html, body {
+  background: var(--bg);
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: var(--font-plus-jakarta-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: rgba(255,255,255,0.15); }
+
+/* ── Form resets ──────────────────────────────────────────────────────────── */
+input, textarea, select { outline: none; }
+
+/* Hide number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ── Animations ───────────────────────────────────────────────────────────── */
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.08; transform: scale(0.7); }
+  50%       { opacity: 1;    transform: scale(1.3); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.25; }
+  50%       { opacity: 0.65; }
+}
+
+@keyframes success-pop {
+  0%   { opacity: 0; transform: scale(0.75); }
+  30%  { opacity: 1; transform: scale(1.08); }
+  60%  { transform: scale(0.97); }
+  80%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+@keyframes loader {
+  0%   { width: 0%; }
+  60%  { width: 85%; }
+  100% { width: 100%; }
+}
+
+@keyframes bounce-dot {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.6); }
+}
+
+@keyframes press {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(0.93); }
+  100% { transform: scale(1); }
+}
+
+.animate-twinkle      { animation: twinkle ease-in-out infinite; }
+.animate-slide-up     { animation: slide-up 0.3s cubic-bezier(0.16,1,0.3,1) both; }
+.animate-slide-down   { animation: slide-down 0.25s ease-out both; }
+.animate-fade-in      { animation: fade-in 0.2s ease-out both; }
+.animate-scale-in     { animation: scale-in 0.3s cubic-bezier(0.16,1,0.3,1) both; }
+.animate-glow-pulse   { animation: glow-pulse 3s ease-in-out infinite; }
+.animate-success-pop  { animation: success-pop 2.2s cubic-bezier(0.16,1,0.3,1) forwards; }
+.animate-shimmer {
+  background: linear-gradient(90deg, var(--card) 25%, #1e1e1e 50%, var(--card) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite;
+}
+
+/* stagger helpers */
+.stagger-1 { animation-delay: 0.06s; }
+.stagger-2 { animation-delay: 0.12s; }
+.stagger-3 { animation-delay: 0.18s; }
+.stagger-4 { animation-delay: 0.24s; }
+
+/* ── Safe area / bottom nav ───────────────────────────────────────────────── */
+.pb-nav {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 68px);
+}

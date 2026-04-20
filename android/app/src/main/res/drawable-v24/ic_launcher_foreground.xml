@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Safe zone: 66dp circle centered in 108dp canvas → max content radius = 33dp
+  Content box: x 29–79, y 34–74 (50×40dp centered at 54,54)
+  Furthest corner from center: sqrt(25²+20²) = 32dp < 33dp ✓
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- K: stem -->
+    <path android:fillColor="#FFFFFF" android:pathData="M29,34 H37 V74 H29 Z"/>
+    <!-- K: top arm -->
+    <path android:fillColor="#FFFFFF" android:pathData="M37,54 L52,34 H59 L44,54 Z"/>
+    <!-- K: bottom arm -->
+    <path android:fillColor="#FFFFFF" android:pathData="M37,54 L44,54 L59,74 H52 Z"/>
+
+    <!-- C: left bar -->
+    <path android:fillColor="#FFFFFF" android:pathData="M62,34 H70 V74 H62 Z"/>
+    <!-- C: top bar -->
+    <path android:fillColor="#FFFFFF" android:pathData="M70,34 H79 V43 H70 Z"/>
+    <!-- C: bottom bar -->
+    <path android:fillColor="#FFFFFF" android:pathData="M70,65 H79 V74 H70 Z"/>
+
+</vector>
