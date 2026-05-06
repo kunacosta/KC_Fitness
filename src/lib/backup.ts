@@ -6,8 +6,8 @@ import { LOCAL_STORAGE_KEY } from "@/lib/local-storage/constants";
 
 // Minimal structural guard — rejects arbitrary JSON before it reaches localStorage.
 const backupSchema = z.object({
-  exercises: z.array(z.record(z.unknown())),
-  workouts: z.array(z.record(z.unknown())),
+  exercises: z.array(z.record(z.string(), z.unknown())),
+  workouts: z.array(z.record(z.string(), z.unknown())),
 });
 
 const BACKUP_FILENAME = "kc-fitness-backup.json";

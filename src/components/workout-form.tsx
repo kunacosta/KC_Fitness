@@ -31,7 +31,6 @@ type WorkoutBlock = {
   exerciseId: string;
   orderIndex: number;
   notes: string;
-  seedBackoffSets: boolean;
   recommendationAppliedAt?: number;
   sets: WorkoutSet[];
 };
@@ -97,7 +96,6 @@ function createDefaultBlock(exerciseId: string, orderIndex: number, exercise?: E
     exerciseId,
     orderIndex,
     notes: "",
-    seedBackoffSets: false,
     sets: createDefaultSets(mt),
   };
 }
@@ -220,8 +218,8 @@ function ExercisePicker({
     function onOutside(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
-    if (open) document.addEventListener("mousedown", onOutside);
-    return () => document.removeEventListener("mousedown", onOutside);
+    if (open) document.addEventListener("pointerdown", onOutside);
+    return () => document.removeEventListener("pointerdown", onOutside);
   }, [open]);
 
   return (
@@ -268,7 +266,7 @@ export function WorkoutForm({ exercises, performedAt: performedAtProp, onSuccess
   const router = useRouter();
   const [isRefreshing, startTransition] = useTransition();
   const [title, setTitle] = useState("Training Session");
-  const [durationMin, setDurationMin] = useState(60);
+  const [durationMin, setDurationMin] = useState(0);
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -397,9 +395,14 @@ export function WorkoutForm({ exercises, performedAt: performedAtProp, onSuccess
         <label className="space-y-2 text-sm text-[#ccc]">
           <span>Duration (min)</span>
           <input
-            type="number"
-            value={durationMin}
-            onChange={(e) => setDurationMin(Number(e.target.value))}
+            inputMode="numeric"
+            value={durationMin === 0 ? "" : durationMin}
+            placeholder="0"
+            onFocus={(e) => e.target.select()}
+            onChange={(e) => {
+              const n = parseInt(e.target.value, 10);
+              setDurationMin(isNaN(n) ? 0 : n);
+            }}
             className="w-full rounded-2xl border border-white/10 bg-[#111111] px-4 py-3 text-white"
           />
         </label>
@@ -429,7 +432,6 @@ export function WorkoutForm({ exercises, performedAt: performedAtProp, onSuccess
                         updateBlock(blockIndex, {
                           exerciseId: id,
                           sets: createDefaultSets(getMeasurementType(newExercise)),
-                          seedBackoffSets: false,
                         });
                       }}
                     />
@@ -766,9 +768,10 @@ function NumericField({
         min={min}
         max={max}
         placeholder={placeholder}
-        onFocus={(e) => {
+        onFocus={() => {
           setIsFocused(true);
-          e.target.select();
+          // Clear zeros on focus so the user can type without having to delete first
+          if (display === "0" || display === String(min ?? 0)) setDisplay("");
         }}
         onBlur={() => {
           setIsFocused(false);

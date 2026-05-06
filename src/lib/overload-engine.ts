@@ -533,22 +533,3 @@ export function calculateOverload(input: SessionPerformanceInput): OverloadCompu
   }
 }
 
-export const demoOverload = calculateOverload({
-  profile: {
-    name: "Incline Dumbbell Press",
-    measurementType: "WEIGHT_REPS",
-    incrementStep: 2.5,
-    repTargetMin: 6,
-    repTargetMax: 10,
-    targetRirMin: 0,
-    targetRirMax: 2,
-  },
-  sets: [
-    { weight: 30, reps: 10, rir: 1 },
-    { weight: 30, reps: 9, rir: 1 },
-    { weight: 27.5, reps: 10, rir: 2 },
-  ],
-  previousSessions: [
-    { totalVolume: 790, effectiveVolume: 703, averageRir: 1.8, topWeight: 30, topReps: 9 },
-  ],
-});
