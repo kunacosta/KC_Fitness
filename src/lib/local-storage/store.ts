@@ -22,9 +22,9 @@ export function readLocalAppState(): LocalAppState {
   try {
     return JSON.parse(raw) as LocalAppState;
   } catch {
-    const initialState = buildInitialLocalAppState();
-    writeLocalAppState(initialState);
-    return initialState;
+    // Corrupted data — return fallback without overwriting so the user
+    // still has a chance to recover the raw value manually.
+    return buildInitialLocalAppState();
   }
 }
 

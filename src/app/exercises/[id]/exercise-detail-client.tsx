@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
 
 import { AppShell } from "@/components/app-shell";
@@ -32,13 +32,8 @@ export function ExerciseDetailClient() {
   const params = useParams<{ id: string }>();
   const id = params?.id ?? "";
 
-  const [exercises, setExercises] = useState<ExerciseDto[]>([]);
-  const [workouts, setWorkouts] = useState<WorkoutSessionDto[]>([]);
-
-  useEffect(() => {
-    setExercises(mapLocalExercisesToDto(dbGetExercises()));
-    setWorkouts(mapLocalWorkoutsToDto(dbGetWorkouts()));
-  }, []);
+  const [exercises] = useState<ExerciseDto[]>(() => mapLocalExercisesToDto(dbGetExercises()));
+  const [workouts] = useState<WorkoutSessionDto[]>(() => mapLocalWorkoutsToDto(dbGetWorkouts()));
 
   const exercise = exercises.find((item) => item.id === id);
 

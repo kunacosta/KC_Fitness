@@ -10,7 +10,7 @@ export function seedDemoData() {
   const bench = dbCreateExercise({
     name: "Bench Press",
     slug: "bench-press-demo",
-    category: "STRENGTH",
+    category: "FULL_BODY",
     movementPattern: "PUSH",
     equipment: "BARBELL",
     measurementType: "WEIGHT_REPS",
@@ -26,7 +26,7 @@ export function seedDemoData() {
   const squat = dbCreateExercise({
     name: "Back Squat",
     slug: "back-squat-demo",
-    category: "STRENGTH",
+    category: "FULL_BODY",
     movementPattern: "SQUAT",
     equipment: "BARBELL",
     measurementType: "WEIGHT_REPS",
@@ -42,7 +42,7 @@ export function seedDemoData() {
   const pullup = dbCreateExercise({
     name: "Pull-up",
     slug: "pull-up-demo",
-    category: "STRENGTH",
+    category: "FULL_BODY",
     movementPattern: "PULL",
     equipment: "BODYWEIGHT",
     measurementType: "REPS_ONLY",
@@ -59,7 +59,7 @@ export function seedDemoData() {
     name: "Plank",
     slug: "plank-demo",
     category: "CORE",
-    movementPattern: "ISOMETRIC",
+    movementPattern: "OTHER",
     equipment: "BODYWEIGHT",
     measurementType: "TIME",
     durationTargetSeconds: 60,

@@ -96,7 +96,7 @@ export function PRTable({ workouts }: { workouts: WorkoutSessionDto[] }) {
           </thead>
           <tbody className="divide-y divide-white/6">
             {prs.map((pr) => (
-              <tr key={pr.exerciseName}>
+              <tr key={`${pr.exerciseName}-${pr.measurementType}`}>
                 <td className="py-3 pr-4 font-medium text-white">{pr.exerciseName}</td>
                 <td className="py-3 pr-4 text-emerald-300">{pr.allTime}</td>
                 <td className="py-3 pr-4 text-[#ccc]">{pr.last90 ?? "—"}</td>

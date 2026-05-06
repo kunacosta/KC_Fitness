@@ -114,15 +114,9 @@ function mapPrefillSets(prefill: WorkoutPrefillDto): WorkoutSet[] {
   }));
 }
 
-function roundToIncrement(value: number, increment: number) {
-  if (!increment || increment <= 0) return Math.round(value * 100) / 100;
-  return Math.round(value / increment) * increment;
-}
-
 function buildRecommendedSets(
   prefill: WorkoutPrefillDto,
   exercise?: ExerciseDto,
-  options?: { seedBackoffSets?: boolean },
 ): WorkoutSet[] {
   const fallbackSets = mapPrefillSets(prefill);
   const snapshot = prefill.latestSnapshot;
@@ -162,7 +156,6 @@ function buildRecommendedSets(
 
   const targetWeight = Number(snapshot.nextSuggestedWeight);
   const targetReps = snapshot.nextSuggestedRepMin ?? exercise.repTargetMin ?? fallbackSets[0]?.reps ?? 8;
-  const incrementStep = Number(exercise.incrementStep || 0);
 
   const topSetIndex = fallbackSets.reduce((bestIdx, set, idx, all) => {
     const best = all[bestIdx];
@@ -171,8 +164,6 @@ function buildRecommendedSets(
     if (set.weight === best.weight && set.reps > best.reps) return idx;
     return bestIdx;
   }, 0);
-
-  const previousTopSet = fallbackSets[topSetIndex] ?? fallbackSets[0];
 
   return fallbackSets.map((set, index) => {
     if (index === topSetIndex) {
@@ -502,9 +493,7 @@ export function WorkoutForm({ exercises, performedAt: performedAtProp, onSuccess
                             type="button"
                             onClick={() =>
                               updateBlock(blockIndex, {
-                                sets: buildRecommendedSets(prefill, selectedExercise, {
-                                  seedBackoffSets: block.seedBackoffSets,
-                                }),
+                                sets: buildRecommendedSets(prefill, selectedExercise),
                                 recommendationAppliedAt: Date.now(),
                               })
                             }
@@ -537,7 +526,7 @@ export function WorkoutForm({ exercises, performedAt: performedAtProp, onSuccess
 
               {/* Set rows — type-aware */}
               <div className="space-y-2">
-                <SetRowHeader />
+                <SetRowHeader mt={mt} />
                 {block.sets.map((set, setIndex) => {
                   const prevSet = previousSets[setIndex];
                   const changed = !!block.recommendationAppliedAt && isSetChanged(set, prevSet, mt);
@@ -633,7 +622,7 @@ export function WorkoutForm({ exercises, performedAt: performedAtProp, onSuccess
         if (!prefill?.latestSnapshot || !exercise) return block;
         return {
           ...block,
-          sets: buildRecommendedSets(prefill, exercise, { seedBackoffSets: block.seedBackoffSets }),
+          sets: buildRecommendedSets(prefill, exercise),
           recommendationAppliedAt: Date.now(),
         };
       }),
@@ -709,8 +698,26 @@ function isSetChanged(current: WorkoutSet, previous: WorkoutSet | undefined, mt:
   return false;
 }
 
-function SetRowHeader() {
-  return null;
+function SetRowHeader({ mt }: { mt: MeasurementType }) {
+  const cols = getColumns(mt);
+  const labels: string[] = [];
+  if (cols.showWeight) labels.push("kg");
+  if (cols.showReps) labels.push("Reps");
+  if (cols.showDuration) labels.push("Secs");
+  if (cols.showDistance) labels.push("km");
+
+  return (
+    <div className="flex items-center gap-2 px-3">
+      <div className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-3">
+        {labels.map((label) => (
+          <span key={label} className="text-[10px] uppercase tracking-[0.16em] text-[#555]">
+            {label}
+          </span>
+        ))}
+      </div>
+      <div className="w-[52px] shrink-0" />
+    </div>
+  );
 }
 
 function getColumns(mt: MeasurementType) {
@@ -740,12 +747,14 @@ function NumericField({
   onChange: (v: number) => void;
 }) {
   const [display, setDisplay] = useState(String(value));
-  const focused = useRef(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [prevExternal, setPrevExternal] = useState(value);
 
-  // Sync external value changes (e.g. prefill apply) when not focused
-  useEffect(() => {
-    if (!focused.current) setDisplay(String(value));
-  }, [value]);
+  // When external value changes while not focused, sync display (React-recommended derived state pattern)
+  if (value !== prevExternal) {
+    setPrevExternal(value);
+    if (!isFocused) setDisplay(String(value));
+  }
 
   return (
     <label className="flex flex-col gap-1">
@@ -758,11 +767,11 @@ function NumericField({
         max={max}
         placeholder={placeholder}
         onFocus={(e) => {
-          focused.current = true;
+          setIsFocused(true);
           e.target.select();
         }}
         onBlur={() => {
-          focused.current = false;
+          setIsFocused(false);
           const num = parseFloat(display);
           const safe = isNaN(num) ? (min ?? 0) : num;
           setDisplay(String(safe));

@@ -27,7 +27,7 @@ const exerciseSetSchema = z.object({
 });
 
 const workoutExerciseSchema = z.object({
-  exerciseId: z.string().cuid(),
+  exerciseId: z.string().min(1),
   orderIndex: z.number().int().min(0).max(100),
   notes: z.string().trim().max(280).nullable().optional(),
   sets: z.array(exerciseSetSchema).min(1).max(20),

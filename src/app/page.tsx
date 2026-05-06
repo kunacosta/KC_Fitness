@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Plus, X, ChevronDown, ChevronUp, Trash2, Dumbbell } from "lucide-react";
 import Link from "next/link";
 
@@ -127,25 +127,22 @@ function WorkoutSummaryCard({
 // ── main page ────────────────────────────────────────────────────────────────
 
 export default function Home() {
-  const [exercises, setExercises] = useState<ExerciseDto[]>([]);
-  const [workouts, setWorkouts] = useState<WorkoutSessionDto[]>([]);
+  const [exercises, setExercises] = useState<ExerciseDto[]>(() => mapLocalExercisesToDto(dbGetExercises()));
+  const [workouts, setWorkouts] = useState<WorkoutSessionDto[]>(() => mapLocalWorkoutsToDto(dbGetWorkouts()));
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
   const [showLogForm, setShowLogForm] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() =>
+    typeof window === "undefined" ? false : !localStorage.getItem(ONBOARDED_KEY),
+  );
   const [logTime, setLogTime] = useState<string>(() => {
     const now = new Date();
     return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
   });
 
-  const loadData = useCallback(() => {
+  function loadData() {
     setExercises(mapLocalExercisesToDto(dbGetExercises()));
     setWorkouts(mapLocalWorkoutsToDto(dbGetWorkouts()));
-  }, []);
-
-  useEffect(() => {
-    loadData();
-    if (!localStorage.getItem(ONBOARDED_KEY)) setShowOnboarding(true);
-  }, [loadData]);
+  }
 
   function dismissOnboarding() {
     localStorage.setItem(ONBOARDED_KEY, "1");
@@ -156,11 +153,6 @@ export default function Home() {
     dbDeleteWorkout(workoutId);
     loadData();
   }
-
-  // Collapse form when switching days
-  useEffect(() => {
-    setShowLogForm(false);
-  }, [selectedDate]);
 
   const workoutDateSet = useMemo<Set<string>>(() => {
     return new Set(workouts.map((w) => toDateKey(new Date(w.performedAt))));
@@ -182,6 +174,11 @@ export default function Home() {
     month: "long",
     year: "numeric",
   });
+
+  function handleSelectDate(date: Date) {
+    setSelectedDate(date);
+    setShowLogForm(false);
+  }
 
   function handleLogSuccess() {
     loadData();
@@ -216,7 +213,7 @@ export default function Home() {
         <Calendar
           selectedDate={selectedDate}
           workoutDates={workoutDateSet}
-          onSelectDate={setSelectedDate}
+          onSelectDate={handleSelectDate}
         />
 
         {/* Selected day panel */}

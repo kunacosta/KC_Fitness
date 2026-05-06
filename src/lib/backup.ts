@@ -1,7 +1,14 @@
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
+import { z } from "zod";
 import { LOCAL_STORAGE_KEY } from "@/lib/local-storage/constants";
+
+// Minimal structural guard — rejects arbitrary JSON before it reaches localStorage.
+const backupSchema = z.object({
+  exercises: z.array(z.record(z.unknown())),
+  workouts: z.array(z.record(z.unknown())),
+});
 
 const BACKUP_FILENAME = "kc-fitness-backup.json";
 
@@ -65,18 +72,31 @@ export async function exportBackup(): Promise<void> {
 
 // ── Restore from file ─────────────────────────────────────────────────────────
 
-export function restoreFromFile(file: File, onDone: () => void): void {
+export function restoreFromFile(
+  file: File,
+  onDone: () => void,
+  onError?: (msg: string) => void,
+): void {
+  const fail = (msg: string) =>
+    onError?.(msg) ?? console.warn("KC Fitness: restore rejected —", msg);
+
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
       const text = e.target?.result as string;
-      JSON.parse(text); // validate JSON
+      const parsed = JSON.parse(text);
+      const result = backupSchema.safeParse(parsed);
+      if (!result.success) {
+        fail("Invalid backup file. Please use a file exported from KC Fitness.");
+        return;
+      }
       localStorage.setItem(LOCAL_STORAGE_KEY, text);
       onDone();
     } catch {
-      alert("Invalid backup file. Please use a file exported from KC Fitness.");
+      fail("Invalid backup file. Please use a file exported from KC Fitness.");
     }
   };
+  reader.onerror = () => fail("Failed to read the file. Please try again.");
   reader.readAsText(file);
 }
 

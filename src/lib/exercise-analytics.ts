@@ -26,63 +26,52 @@ export function buildExerciseAnalytics(
     .filter((snapshot) => snapshot.exerciseId === exerciseId)
     .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
-  let primaryLabel = "Volume (kg·reps)";
-  let secondaryLabel = "e1RM (kg)";
+  let primaryLabel: string;
+  let secondaryLabel: string;
+
+  switch (measurementType) {
+    case "REPS_ONLY":   primaryLabel = "Total reps";       secondaryLabel = "";             break;
+    case "TIME":        primaryLabel = "Best hold (s)";    secondaryLabel = "Total (s)";    break;
+    case "DISTANCE_TIME": primaryLabel = "Distance (km)"; secondaryLabel = "Pace (min/km)"; break;
+    case "WEIGHT_TIME": primaryLabel = "Volume (kg·s)";   secondaryLabel = "Best hold (s)"; break;
+    default:            primaryLabel = "Volume (kg·reps)"; secondaryLabel = "e1RM (kg)";    break;
+  }
 
   const chartData: ExerciseHistoryPoint[] = snapshots.map((snapshot, index) => {
     const date = shortDate(snapshot.createdAt);
     const sessionLabel = `S${index + 1}`;
 
     switch (measurementType) {
-      case "REPS_ONLY": {
-        primaryLabel = "Total reps";
-        secondaryLabel = "";
-        return {
-          date,
-          sessionLabel,
-          primary: Number(snapshot.totalVolume),
-          secondary: 0,
-        };
-      }
-      case "TIME": {
-        primaryLabel = "Best hold (s)";
-        secondaryLabel = "Total (s)";
+      case "REPS_ONLY":
+        return { date, sessionLabel, primary: Number(snapshot.totalVolume), secondary: 0 };
+      case "TIME":
         return {
           date,
           sessionLabel,
           primary: snapshot.bestDurationSeconds ?? 0,
           secondary: snapshot.totalDurationSeconds ?? 0,
         };
-      }
-      case "DISTANCE_TIME": {
-        primaryLabel = "Distance (km)";
-        secondaryLabel = "Pace (min/km)";
+      case "DISTANCE_TIME":
         return {
           date,
           sessionLabel,
           primary: Number(snapshot.totalDistanceKm ?? 0),
           secondary: Number(snapshot.bestPaceMinPerKm ?? 0),
         };
-      }
-      case "WEIGHT_TIME": {
-        primaryLabel = "Volume (kg·s)";
-        secondaryLabel = "Best hold (s)";
+      case "WEIGHT_TIME":
         return {
           date,
           sessionLabel,
           primary: Number(snapshot.totalVolume),
           secondary: snapshot.bestDurationSeconds ?? 0,
         };
-      }
-      default: {
-        // WEIGHT_REPS
+      default:
         return {
           date,
           sessionLabel,
           primary: Number(snapshot.totalVolume),
           secondary: Number(snapshot.estimated1RM ?? 0),
         };
-      }
     }
   });
 

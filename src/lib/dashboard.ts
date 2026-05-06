@@ -51,7 +51,7 @@ export function buildDashboardSummary(
 
   const trend = workouts
     .slice(0, 7)
-    .map((workout, index) => ({
+    .map((workout) => ({
       name: new Date(workout.performedAt).toLocaleDateString("en-MY", { month: "short", day: "numeric" }),
       volume: workout.workoutExercises.reduce(
         (sum, ex) =>
@@ -59,7 +59,8 @@ export function buildDashboardSummary(
           ex.sets.reduce((setSum, set) => {
             // Use weight×reps for traditional lifts; total reps or duration for others
             const mt = ex.exercise.measurementType;
-            if (mt === "WEIGHT_REPS" || mt === "WEIGHT_TIME") return setSum + Number(set.weight) * (set.reps || 1);
+            if (mt === "WEIGHT_REPS") return setSum + Number(set.weight) * (set.reps || 1);
+            if (mt === "WEIGHT_TIME") return setSum + Number(set.weight) * (set.durationSeconds ?? 0);
             if (mt === "REPS_ONLY") return setSum + set.reps;
             if (mt === "TIME" || mt === "DISTANCE_TIME") return setSum + (set.durationSeconds ?? 0);
             return setSum;

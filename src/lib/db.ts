@@ -17,7 +17,7 @@ import type {
 // ── ID generation ─────────────────────────────────────────────────────────────
 
 function genId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+  return crypto.randomUUID();
 }
 
 // ── Exercises ─────────────────────────────────────────────────────────────────
@@ -133,9 +133,10 @@ export function dbCreateWorkout(input: CreateWorkoutInput): LocalWorkoutSession 
     const exercise = state.exercises.find((e) => e.id === workoutExercise.exerciseId);
     if (!exercise) throw new Error(`Exercise ${workoutExercise.exerciseId} not found`);
 
+    const workoutExerciseId = genId();
     const sets: LocalExerciseSet[] = workoutExercise.sets.map((set) => ({
       id: genId(),
-      workoutExerciseId: genId(),
+      workoutExerciseId,
       setNumber: set.setNumber,
       setType: set.setType,
       weight: set.weight ?? 0,
@@ -150,7 +151,7 @@ export function dbCreateWorkout(input: CreateWorkoutInput): LocalWorkoutSession 
     }));
 
     return {
-      id: genId(),
+      id: workoutExerciseId,
       workoutSessionId: sessionId,
       exerciseId: workoutExercise.exerciseId,
       orderIndex: workoutExercise.orderIndex,

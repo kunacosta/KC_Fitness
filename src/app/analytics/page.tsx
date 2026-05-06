@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/card";
@@ -50,15 +50,11 @@ function formatSnapshotTarget(snapshot: ProgressionSnapshotDto): string {
 
 
 export default function AnalyticsPage() {
-  const [workouts, setWorkouts] = useState<WorkoutSessionDto[]>([]);
+  const [workouts, setWorkouts] = useState<WorkoutSessionDto[]>(() => mapLocalWorkoutsToDto(dbGetWorkouts()));
 
   function reload() {
     setWorkouts(mapLocalWorkoutsToDto(dbGetWorkouts()));
   }
-
-  useEffect(() => {
-    reload();
-  }, []);
 
   const allSnapshots = workouts.flatMap((s) => s.progressionSnapshots ?? []);
   const suggestionCounts = buildSuggestionCounts(allSnapshots);

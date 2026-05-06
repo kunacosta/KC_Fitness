@@ -102,7 +102,7 @@ export function Calendar({ selectedDate, workoutDates, onSelectDate }: CalendarP
 
           return (
             <button
-              key={day}
+              key={`${viewYear}-${viewMonth}-${day}`}
               onClick={() => onSelectDate(date)}
               className={[
                 "relative flex flex-col items-center justify-center py-3.5 transition-all duration-100 active:scale-90",

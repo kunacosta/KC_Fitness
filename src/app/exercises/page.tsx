@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 import { AppShell } from "@/components/app-shell";
@@ -11,15 +11,11 @@ import { mapLocalExercisesToDto } from "@/lib/local-storage/mappers";
 import type { ExerciseDto } from "@/types/api";
 
 export default function ExercisesPage() {
-  const [exercises, setExercises] = useState<ExerciseDto[]>([]);
+  const [exercises, setExercises] = useState<ExerciseDto[]>(() => mapLocalExercisesToDto(dbGetExercises()));
 
-  const loadExercises = useCallback(() => {
+  function loadExercises() {
     setExercises(mapLocalExercisesToDto(dbGetExercises()));
-  }, []);
-
-  useEffect(() => {
-    loadExercises();
-  }, [loadExercises]);
+  }
 
   return (
     <AppShell currentPath="/exercises" title="Library">

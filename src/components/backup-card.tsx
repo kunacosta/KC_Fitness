@@ -7,7 +7,7 @@ import { exportBackup, restoreFromFile, getLastAutoSaveDate } from "@/lib/backup
 export function BackupCard({ onRestore }: { onRestore: () => void }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [lastSave, setLastSave] = useState<string | null>(null);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState<{ msg: string; ok: boolean } | null>(null);
 
   useEffect(() => {
     getLastAutoSaveDate().then(setLastSave);
@@ -22,11 +22,18 @@ export function BackupCard({ onRestore }: { onRestore: () => void }) {
   }
 
   function handleRestore(file: File) {
-    restoreFromFile(file, () => {
-      setStatus("Data restored.");
-      onRestore();
-      setTimeout(() => setStatus(""), 3000);
-    });
+    restoreFromFile(
+      file,
+      () => {
+        setStatus({ msg: "Data restored.", ok: true });
+        onRestore();
+        setTimeout(() => setStatus(null), 3000);
+      },
+      (msg) => {
+        setStatus({ msg, ok: false });
+        setTimeout(() => setStatus(null), 4000);
+      },
+    );
   }
 
   return (
@@ -71,7 +78,11 @@ export function BackupCard({ onRestore }: { onRestore: () => void }) {
         />
       </div>
 
-      {status && <p className="mt-2 text-xs text-emerald-400">{status}</p>}
+      {status && (
+        <p className={`mt-2 text-xs ${status.ok ? "text-emerald-400" : "text-rose-400"}`}>
+          {status.msg}
+        </p>
+      )}
     </div>
   );
 }

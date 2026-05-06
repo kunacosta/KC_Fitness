@@ -96,8 +96,8 @@ export function mapLocalPrefillToDto(result: PrefillResult): WorkoutPrefillDto {
       weight: String(set.weight),
       reps: set.reps,
       durationSeconds: set.durationSeconds ?? null,
-      distanceKm: typeof set.distanceKm === "number" ? String(set.distanceKm) : null,
-      rir: typeof set.rir === "number" ? String(set.rir) : null,
+      distanceKm: typeof set.distanceKm === "number" && !Number.isNaN(set.distanceKm) ? String(set.distanceKm) : null,
+      rir: typeof set.rir === "number" && !Number.isNaN(set.rir) ? String(set.rir) : null,
     })),
     latestSnapshot: result.latestSnapshot ? mapLocalSnapshotToDto(result.latestSnapshot) : null,
   };
