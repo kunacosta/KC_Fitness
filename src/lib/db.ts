@@ -276,10 +276,13 @@ export function dbCreateWorkout(input: CreateWorkoutInput): LocalWorkoutSession 
 
   writeLocalAppState({ ...state, workouts: [...state.workouts, session] });
 
-  // Fire-and-forget: auto-save backup to device Documents folder after every workout
+  // Fire-and-forget: auto-save backup to device Documents folder and server after every workout
   if (typeof window !== "undefined") {
     import("@/lib/backup").then(({ autoSaveToDevice }) => {
       autoSaveToDevice();
+    });
+    import("@/lib/server-backup").then(({ syncToServer }) => {
+      syncToServer().catch(() => {});
     });
   }
 
