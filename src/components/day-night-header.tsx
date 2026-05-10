@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Moon, Sunrise, Sun, Sunset } from "lucide-react";
 
 type Period = "night" | "morning" | "afternoon" | "evening";
@@ -77,13 +77,13 @@ const PERIOD_ICON = {
 function Stars() {
   const stars = useMemo(
     () =>
-      Array.from({ length: 32 }, (_, i) => ({
+      Array.from({ length: 52 }, (_, i) => ({
         x: (i * 41 + 7) % 97,
         y: (i * 67 + 13) % 88,
         size: (i % 3) + 1,
         delay: (i * 0.41) % 4,
         duration: 1.8 + (i % 5) * 0.4,
-        opacity: 0.4 + (i % 3) * 0.2,
+        opacity: 0.3 + (i % 3) * 0.25,
       })),
     [],
   );
@@ -105,6 +105,23 @@ function Stars() {
         />
       ))}
     </div>
+  );
+}
+
+function ShootingStar({ x, y }: { x: number; y: number }) {
+  return (
+    <div
+      className="animate-shooting-star pointer-events-none absolute rounded-full"
+      style={{
+        left: `${x}%`,
+        top: `${y}%`,
+        width: "60px",
+        height: "1px",
+        background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent)",
+        transform: "rotate(30deg)",
+        transformOrigin: "left center",
+      }}
+    />
   );
 }
 
@@ -138,6 +155,8 @@ export function DayNightHeader() {
   const [dateStr, setDateStr] = useState(() =>
     new Date().toLocaleDateString("en-MY", { month: "short", day: "numeric" }),
   );
+  const [shootingStar, setShootingStar] = useState<{ x: number; y: number; key: number } | null>(null);
+  const shootingStarRef = useRef(0);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -149,6 +168,17 @@ export function DayNightHeader() {
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    if (period !== "night") return;
+    const fire = () => {
+      setShootingStar({ x: 5 + Math.random() * 55, y: 5 + Math.random() * 35, key: ++shootingStarRef.current });
+      setTimeout(() => setShootingStar(null), 1200);
+    };
+    fire();
+    const id = setInterval(fire, 7000);
+    return () => clearInterval(id);
+  }, [period]);
+
   const cfg = PERIOD_CONFIG[period];
   const Icon = PERIOD_ICON[period];
 
@@ -157,19 +187,22 @@ export function DayNightHeader() {
       className="relative overflow-hidden rounded-2xl px-5 py-6"
       style={{ background: cfg.cardBg }}
     >
-      {/* Top ambient glow */}
+      {/* Top ambient glow — drifts like a nebula */}
       <div
-        className="animate-glow-pulse pointer-events-none absolute inset-0"
+        className="animate-nebula-drift pointer-events-none absolute inset-0"
         style={{ background: cfg.topGlow }}
       />
       {/* Bottom ambient glow */}
       <div
-        className="pointer-events-none absolute inset-0"
-        style={{ background: cfg.bottomGlow, opacity: 0.8 }}
+        className="animate-nebula-drift pointer-events-none absolute inset-0"
+        style={{ background: cfg.bottomGlow, opacity: 0.8, animationDelay: "4s", animationDirection: "reverse" }}
       />
 
-      {/* Night stars */}
+      {/* Night stars + shooting star */}
       {cfg.showStars && <Stars />}
+      {cfg.showStars && shootingStar && (
+        <ShootingStar key={shootingStar.key} x={shootingStar.x} y={shootingStar.y} />
+      )}
 
       {/* Morning light rays */}
       {period === "morning" && <MorningRays color={cfg.accentColor} />}
@@ -187,7 +220,7 @@ export function DayNightHeader() {
         <div>
           <div className="flex items-center gap-2">
             <Icon
-              className="h-3.5 w-3.5 shrink-0"
+              className="animate-float h-3.5 w-3.5 shrink-0"
               style={{ color: cfg.textAccent }}
               strokeWidth={2.5}
             />

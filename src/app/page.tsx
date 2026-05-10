@@ -235,8 +235,10 @@ export default function Home() {
           {/* Workouts for this day */}
           {dayWorkouts.length > 0 && (
             <div className="space-y-2">
-              {dayWorkouts.map((w) => (
-                <WorkoutSummaryCard key={w.id} workout={w} onDelete={handleDelete} />
+              {dayWorkouts.map((w, i) => (
+                <div key={w.id} className="animate-slide-up" style={{ animationDelay: `${i * 0.06}s` }}>
+                  <WorkoutSummaryCard workout={w} onDelete={handleDelete} />
+                </div>
               ))}
             </div>
           )}
@@ -262,12 +264,15 @@ export default function Home() {
                   onClick={() => setShowLogForm(true)}
                   className="flex w-full items-center gap-3 px-4 py-4 text-left transition hover:bg-white/3"
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/4">
-                    <Plus className="h-4 w-4 text-[#bbb]" />
+                  <div
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
+                    style={{ background: "var(--accent-dim)", border: "1px solid rgba(124,106,245,0.25)" }}
+                  >
+                    <Plus className="h-4 w-4" style={{ color: "var(--accent-2)" }} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#bbb]">Log workout</p>
-                    <p className="text-[11px] text-[#bbb]">No session recorded for this day</p>
+                    <p className="text-sm font-medium text-white">Log workout</p>
+                    <p className="text-[11px] text-[#666]">No session recorded for this day</p>
                   </div>
                 </button>
               ) : (

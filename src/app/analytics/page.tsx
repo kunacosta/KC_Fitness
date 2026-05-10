@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Zap, TrendingUp, Layers } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/card";
@@ -98,22 +99,22 @@ export default function AnalyticsPage() {
 
         {/* ── This week strip ── */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-2xl border border-white/8 bg-[#161616] p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-[#999]">This week</p>
-            <p className="mt-2 text-2xl font-semibold text-white">{thisWeekWorkouts.length}</p>
-            <p className="mt-0.5 text-xs text-[#999]">sessions</p>
+          <div className="animate-slide-up rounded-2xl border border-white/8 bg-[#161616] p-4">
+            <Zap className="h-3.5 w-3.5 mb-2" style={{ color: "var(--accent-2)" }} />
+            <p className="text-2xl font-semibold text-white">{thisWeekWorkouts.length}</p>
+            <p className="mt-0.5 text-xs text-[#666]">sessions</p>
           </div>
-          <div className="rounded-2xl border border-white/8 bg-[#161616] p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-[#999]">Volume</p>
-            <p className="mt-2 text-2xl font-semibold text-white">
+          <div className="animate-slide-up stagger-1 rounded-2xl border border-white/8 bg-[#161616] p-4">
+            <TrendingUp className="h-3.5 w-3.5 mb-2 text-sky-400" />
+            <p className="text-2xl font-semibold text-white">
               {thisWeekVolume > 0 ? `${Math.round(thisWeekVolume / 1000)}k` : "—"}
             </p>
-            <p className="mt-0.5 text-xs text-[#999]">kg·reps</p>
+            <p className="mt-0.5 text-xs text-[#666]">kg·reps</p>
           </div>
-          <div className="rounded-2xl border border-white/8 bg-[#161616] p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-[#999]">Exercises</p>
-            <p className="mt-2 text-2xl font-semibold text-white">{uniqueExercises.length}</p>
-            <p className="mt-0.5 text-xs text-[#999]">tracked</p>
+          <div className="animate-slide-up stagger-2 rounded-2xl border border-white/8 bg-[#161616] p-4">
+            <Layers className="h-3.5 w-3.5 mb-2 text-emerald-400" />
+            <p className="text-2xl font-semibold text-white">{uniqueExercises.length}</p>
+            <p className="mt-0.5 text-xs text-[#666]">tracked</p>
           </div>
         </div>
 
@@ -156,11 +157,11 @@ export default function AnalyticsPage() {
           <div className="grid gap-6">
             <p className="text-xs uppercase tracking-[0.24em] text-[#bbb]">Progression trends</p>
             <div className="grid gap-6 lg:grid-cols-2">
-              {uniqueExercises.map(({ id, exercise }) => {
+              {uniqueExercises.map(({ id, exercise }, idx) => {
                 const analytics = buildExerciseAnalytics(workouts, id, exercise as Parameters<typeof buildExerciseAnalytics>[2]);
                 const latest = analytics.latestSnapshot;
                 return (
-                  <Card key={id}>
+                  <Card key={id} className="animate-slide-up" style={{ animationDelay: `${idx * 0.07}s` }}>
                     <div className="mb-1 flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <h3 className="truncate font-semibold text-white">{exercise.name}</h3>
