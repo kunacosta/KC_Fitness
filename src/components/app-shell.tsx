@@ -44,7 +44,7 @@ export function AppShell({ children, title, currentPath }: AppShellProps) {
         <div className="mx-auto flex max-w-3xl items-stretch px-2">
           {NAV.map((item) => {
             const Icon = item.icon;
-            const isActive = currentPath === item.href;
+            const isActive = item.href === "/" ? currentPath === "/" : currentPath.startsWith(item.href);
             return (
               <Link
                 key={item.href}

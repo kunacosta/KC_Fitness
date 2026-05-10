@@ -57,15 +57,27 @@ export function Calendar({ selectedDate, workoutDates, onSelectDate }: CalendarP
       <div className="flex items-center justify-between border-b border-white/6 px-4 py-3">
         <button
           onClick={prevMonth}
+          aria-label="Previous month"
           className="flex h-11 w-11 items-center justify-center rounded-xl text-[#999] transition hover:text-white active:scale-90"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <span className="text-sm font-semibold text-white">
-          {MONTHS[viewMonth]} {viewYear}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold text-white">
+            {MONTHS[viewMonth]} {viewYear}
+          </span>
+          {(viewMonth !== today.getMonth() || viewYear !== today.getFullYear()) && (
+            <button
+              onClick={() => { setViewYear(today.getFullYear()); setViewMonth(today.getMonth()); }}
+              className="rounded-full border border-white/10 px-2.5 py-0.5 text-[10px] font-medium text-[#bbb] transition hover:border-white/20 hover:text-white"
+            >
+              Today
+            </button>
+          )}
+        </div>
         <button
           onClick={nextMonth}
+          aria-label="Next month"
           className="flex h-11 w-11 items-center justify-center rounded-xl text-[#999] transition hover:text-white active:scale-90"
         >
           <ChevronRight className="h-4 w-4" />
@@ -104,6 +116,8 @@ export function Calendar({ selectedDate, workoutDates, onSelectDate }: CalendarP
             <button
               key={`${viewYear}-${viewMonth}-${day}`}
               onClick={() => onSelectDate(date)}
+              aria-label={`${day} ${MONTHS[viewMonth]} ${viewYear}${hasWorkout ? ", has workout" : ""}`}
+              aria-pressed={isSelected}
               className={[
                 "relative flex flex-col items-center justify-center py-3.5 transition-all duration-100 active:scale-90",
                 "border-b border-white/6",

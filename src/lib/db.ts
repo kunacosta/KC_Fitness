@@ -294,6 +294,39 @@ export function dbDeleteWorkout(workoutId: string): void {
   });
 }
 
+export interface UpdateExerciseInput {
+  name?: string;
+  primaryMuscle?: string | null;
+  secondaryMuscles?: string | null;
+  notes?: string | null;
+  incrementStep?: number;
+  repTargetMin?: number;
+  repTargetMax?: number;
+  targetRirMin?: number | null;
+  targetRirMax?: number | null;
+  durationTargetSeconds?: number | null;
+  distanceTargetKm?: number | null;
+}
+
+export function dbUpdateExercise(id: string, input: UpdateExerciseInput): LocalExercise {
+  const state = readLocalAppState();
+  const exercise = state.exercises.find((e) => e.id === id);
+  if (!exercise) throw new Error(`Exercise ${id} not found`);
+
+  const updated: LocalExercise = {
+    ...exercise,
+    ...input,
+    updatedAt: new Date().toISOString(),
+  };
+
+  writeLocalAppState({
+    ...state,
+    exercises: state.exercises.map((e) => (e.id === id ? updated : e)),
+  });
+
+  return updated;
+}
+
 export function dbDeleteExercise(exerciseId: string): void {
   const state = readLocalAppState();
   writeLocalAppState({

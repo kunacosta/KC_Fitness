@@ -2,19 +2,27 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Trash2 } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/card";
 import { ExerciseForm } from "@/components/exercise-form";
-import { dbGetExercises } from "@/lib/db";
+import { dbGetExercises, dbDeleteExercise } from "@/lib/db";
 import { mapLocalExercisesToDto } from "@/lib/local-storage/mappers";
 import type { ExerciseDto } from "@/types/api";
 
 export default function ExercisesPage() {
   const [exercises, setExercises] = useState<ExerciseDto[]>(() => mapLocalExercisesToDto(dbGetExercises()));
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   function loadExercises() {
     setExercises(mapLocalExercisesToDto(dbGetExercises()));
+  }
+
+  function handleDelete(id: string) {
+    dbDeleteExercise(id);
+    setConfirmDeleteId(null);
+    loadExercises();
   }
 
   return (
@@ -43,7 +51,7 @@ export default function ExercisesPage() {
                 Available exercises
               </p>
               <h2 className="mt-3 text-2xl font-semibold text-white">
-                {exercises.length} exercises ready to log
+                {exercises.length} exercise{exercises.length !== 1 ? "s" : ""} ready to log
               </h2>
             </div>
           </div>
@@ -80,18 +88,46 @@ export default function ExercisesPage() {
                   <span className="text-[#ccc]">Secondary:</span> {exercise.secondaryMuscles ?? "—"}
                 </p>
 
-                <Link
-                  href={`/exercises/${exercise.id}`}
-                  className="mt-5 inline-flex rounded-full border border-white/10 px-3 py-2 text-xs uppercase tracking-[0.18em] text-[#ccc] hover:border-white/20 hover:text-white"
-                >
-                  View analytics
-                </Link>
+                <div className="mt-5 flex items-center justify-between">
+                  <Link
+                    href={`/exercises/${exercise.id}`}
+                    className="inline-flex rounded-full border border-white/10 px-3 py-2 text-xs uppercase tracking-[0.18em] text-[#ccc] hover:border-white/20 hover:text-white"
+                  >
+                    View analytics
+                  </Link>
+
+                  {confirmDeleteId === exercise.id ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-[#bbb]">Delete?</span>
+                      <button
+                        onClick={() => handleDelete(exercise.id)}
+                        className="text-[11px] font-medium text-rose-400 hover:text-rose-300"
+                      >
+                        Yes
+                      </button>
+                      <button
+                        onClick={() => setConfirmDeleteId(null)}
+                        className="text-[11px] text-[#999] hover:text-white"
+                      >
+                        No
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmDeleteId(exercise.id)}
+                      aria-label={`Delete ${exercise.name}`}
+                      className="flex h-8 w-8 items-center justify-center rounded-xl text-[#555] transition hover:text-rose-400"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
               </article>
             ))}
           </div>
 
           <div className="mt-6 rounded-[24px] border border-white/8 bg-[#161616] p-5 text-sm leading-7 text-[#bbb]">
-            New exercises appear in the library and the workout logger immediately after creation.
+            New exercises appear in the library and the workout logger immediately after creation. Deleting an exercise preserves past workout data.
           </div>
         </Card>
       </div>

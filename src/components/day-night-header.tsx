@@ -131,19 +131,21 @@ function MorningRays({ color }: { color: string }) {
 }
 
 export function DayNightHeader() {
-  const [period, setPeriod] = useState<Period>("morning");
-  const [timeStr, setTimeStr] = useState("");
-  const [dateStr, setDateStr] = useState("");
+  const [period, setPeriod] = useState<Period>(() => getPeriod(new Date().getHours()));
+  const [timeStr, setTimeStr] = useState(() =>
+    new Date().toLocaleTimeString("en-MY", { hour: "2-digit", minute: "2-digit" }),
+  );
+  const [dateStr, setDateStr] = useState(() =>
+    new Date().toLocaleDateString("en-MY", { month: "short", day: "numeric" }),
+  );
 
   useEffect(() => {
-    function tick() {
+    const id = setInterval(() => {
       const now = new Date();
       setPeriod(getPeriod(now.getHours()));
       setTimeStr(now.toLocaleTimeString("en-MY", { hour: "2-digit", minute: "2-digit" }));
       setDateStr(now.toLocaleDateString("en-MY", { month: "short", day: "numeric" }));
-    }
-    tick();
-    const id = setInterval(tick, 30_000);
+    }, 30_000);
     return () => clearInterval(id);
   }, []);
 

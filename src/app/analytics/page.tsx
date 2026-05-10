@@ -70,8 +70,11 @@ export default function AnalyticsPage() {
   const uniqueExercises = Array.from(exerciseMap.values());
   const latestSnapshots = uniqueExercises.map((e) => e.latest);
 
-  // This-week summary
-  const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - weekStart.getDay()); weekStart.setHours(0,0,0,0);
+  // This-week summary (Monday start, matching the calendar)
+  const weekStart = new Date();
+  const dayOfWeek = weekStart.getDay();
+  weekStart.setDate(weekStart.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  weekStart.setHours(0, 0, 0, 0);
   const thisWeekWorkouts = workouts.filter((w) => new Date(w.performedAt) >= weekStart);
   const thisWeekVolume = allSnapshots
     .filter((s) => new Date(s.createdAt) >= weekStart)
@@ -82,6 +85,16 @@ export default function AnalyticsPage() {
   return (
     <AppShell currentPath="/analytics" title="Stats">
       <div className="grid gap-6">
+
+        {/* ── Empty state ── */}
+        {workouts.length === 0 && (
+          <div className="rounded-2xl border border-white/8 bg-[#161616] px-5 py-8 text-center">
+            <p className="text-sm font-medium text-white">No workouts logged yet</p>
+            <p className="mt-2 text-sm leading-6 text-[#999]">
+              Log your first session on the Home screen. Stats, personal records, and progression trends appear here automatically.
+            </p>
+          </div>
+        )}
 
         {/* ── This week strip ── */}
         <div className="grid grid-cols-3 gap-3">

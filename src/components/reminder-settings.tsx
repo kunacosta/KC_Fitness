@@ -99,6 +99,9 @@ export function ReminderSettingsCard({ lastWorkoutDate }: ReminderSettingsProps)
 
         {isNative && (
           <button
+            role="switch"
+            aria-checked={settings.enabled}
+            aria-label={settings.enabled ? "Disable workout reminder" : "Enable workout reminder"}
             onClick={handleToggle}
             className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${
               settings.enabled ? "bg-emerald-500" : "bg-white/15"

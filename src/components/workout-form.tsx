@@ -211,12 +211,22 @@ function ExercisePicker({
   onChange: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const ref = useRef<HTMLDivElement>(null);
   const selected = exercises.find((e) => e.id === value);
 
+  const filtered = search.trim()
+    ? exercises.filter((e) => e.name.toLowerCase().includes(search.toLowerCase()))
+    : exercises;
+
+  function closeDropdown() {
+    setOpen(false);
+    setSearch("");
+  }
+
   useEffect(() => {
     function onOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) closeDropdown();
     }
     if (open) document.addEventListener("pointerdown", onOutside);
     return () => document.removeEventListener("pointerdown", onOutside);
@@ -239,23 +249,39 @@ function ExercisePicker({
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-2xl border border-white/10 bg-[#161616] py-1 shadow-xl">
-          {exercises.map((ex) => (
-            <button
-              key={ex.id}
-              type="button"
-              onClick={() => { onChange(ex.id); setOpen(false); }}
-              className={`flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-white/5 ${
-                ex.id === value ? "bg-white/8" : ""
-              }`}
-            >
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium text-white">{ex.name}</span>
-                <span className="block text-[11px] text-[#999]">{MT_LABEL[ex.measurementType] ?? ex.measurementType}</span>
-              </span>
-              {ex.id === value && <span className="ml-2 h-1.5 w-1.5 shrink-0 rounded-full bg-white" />}
-            </button>
-          ))}
+        <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-2xl border border-white/10 bg-[#161616] shadow-xl">
+          <div className="border-b border-white/8 px-4 py-2.5">
+            <input
+              autoFocus
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search exercises..."
+              className="w-full bg-transparent text-sm text-white outline-none placeholder:text-[#555]"
+            />
+          </div>
+          <div className="max-h-52 overflow-y-auto py-1">
+            {filtered.length === 0 ? (
+              <p className="px-4 py-3 text-sm text-[#555]">No match for &ldquo;{search}&rdquo;</p>
+            ) : (
+              filtered.map((ex) => (
+                <button
+                  key={ex.id}
+                  type="button"
+                  onClick={() => { onChange(ex.id); closeDropdown(); }}
+                  className={`flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-white/5 ${
+                    ex.id === value ? "bg-white/8" : ""
+                  }`}
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium text-white">{ex.name}</span>
+                    <span className="block text-[11px] text-[#999]">{MT_LABEL[ex.measurementType] ?? ex.measurementType}</span>
+                  </span>
+                  {ex.id === value && <span className="ml-2 h-1.5 w-1.5 shrink-0 rounded-full bg-white" />}
+                </button>
+              ))
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -571,8 +597,7 @@ export function WorkoutForm({ exercises, performedAt: performedAtProp, onSuccess
       <button
         type="button"
         onClick={() => {
-          const newExercise = exercises[0];
-          setBlocks((c) => [...c, createDefaultBlock(newExercise?.id ?? "", c.length, newExercise)]);
+          setBlocks((c) => [...c, createDefaultBlock("", c.length)]);
         }}
         className="rounded-2xl border border-white/10 px-4 py-3 text-sm text-[#ccc] hover:border-white/20 hover:text-white"
       >
@@ -707,10 +732,11 @@ function SetRowHeader({ mt }: { mt: MeasurementType }) {
   if (cols.showReps) labels.push("Reps");
   if (cols.showDuration) labels.push("Secs");
   if (cols.showDistance) labels.push("km");
+  if (cols.showRir) labels.push("RIR");
 
   return (
     <div className="flex items-center gap-2 px-3">
-      <div className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-3">
+      <div className={`grid flex-1 ${colsGridClass(cols)} gap-2`}>
         {labels.map((label) => (
           <span key={label} className="text-[10px] uppercase tracking-[0.16em] text-[#555]">
             {label}
@@ -728,7 +754,15 @@ function getColumns(mt: MeasurementType) {
     showReps: mt === "WEIGHT_REPS" || mt === "REPS_ONLY",
     showDuration: mt === "TIME" || mt === "DISTANCE_TIME" || mt === "WEIGHT_TIME",
     showDistance: mt === "DISTANCE_TIME",
+    showRir: mt === "WEIGHT_REPS" || mt === "REPS_ONLY",
   };
+}
+
+function colsGridClass(cols: ReturnType<typeof getColumns>): string {
+  const n = Object.values(cols).filter(Boolean).length;
+  if (n >= 3) return "grid-cols-3";
+  if (n === 1) return "grid-cols-1";
+  return "grid-cols-2";
 }
 
 function NumericField({
@@ -815,7 +849,7 @@ function SetRow({
     >
       {/* Numeric inputs + remove button */}
       <div className="flex items-end gap-2">
-        <div className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-3">
+        <div className={`grid flex-1 ${colsGridClass(cols)} gap-2`}>
           {cols.showWeight && (
             <NumericField label="kg" value={set.weight} step={0.5} min={0} onChange={(v) => onChange("weight", v)} />
           )}
@@ -827,6 +861,9 @@ function SetRow({
           )}
           {cols.showDistance && (
             <NumericField label="km" value={set.distanceKm} step={0.1} min={0} onChange={(v) => onChange("distanceKm", v)} />
+          )}
+          {cols.showRir && (
+            <NumericField label="RIR" value={set.rir} step={0.5} min={0} max={10} onChange={(v) => onChange("rir", v)} />
           )}
         </div>
         <button

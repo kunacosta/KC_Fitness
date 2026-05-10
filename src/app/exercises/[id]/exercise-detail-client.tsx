@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { Pencil, Trash2, X, Check } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/card";
 import { ExerciseHistoryChart } from "@/components/exercise-history-chart";
 import { buildExerciseAnalytics } from "@/lib/exercise-analytics";
-import { dbGetExercises, dbGetWorkouts } from "@/lib/db";
+import { dbGetExercises, dbGetWorkouts, dbUpdateExercise, dbDeleteExercise } from "@/lib/db";
 import { mapLocalExercisesToDto, mapLocalWorkoutsToDto } from "@/lib/local-storage/mappers";
 import type { ExerciseDto, WorkoutSessionDto } from "@/types/api";
 
@@ -31,9 +32,13 @@ function formatPace(minPerKm: string | null) {
 export function ExerciseDetailClient() {
   const params = useParams<{ id: string }>();
   const id = params?.id ?? "";
+  const router = useRouter();
 
-  const [exercises] = useState<ExerciseDto[]>(() => mapLocalExercisesToDto(dbGetExercises()));
+  const [exercises, setExercises] = useState<ExerciseDto[]>(() => mapLocalExercisesToDto(dbGetExercises()));
   const [workouts] = useState<WorkoutSessionDto[]>(() => mapLocalWorkoutsToDto(dbGetWorkouts()));
+  const [editing, setEditing] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
   const exercise = exercises.find((item) => item.id === id);
 
@@ -56,6 +61,19 @@ export function ExerciseDetailClient() {
   const analytics = buildExerciseAnalytics(workouts, exercise.id, exercise);
   const mt = exercise.measurementType;
   const latest = analytics.latestSnapshot;
+
+  function handleSaveEdit(patch: Partial<Parameters<typeof dbUpdateExercise>[1]>) {
+    dbUpdateExercise(id, patch);
+    setExercises(mapLocalExercisesToDto(dbGetExercises()));
+    setEditing(false);
+    setSaveStatus("Changes saved.");
+    setTimeout(() => setSaveStatus(null), 2500);
+  }
+
+  function handleDelete() {
+    dbDeleteExercise(id);
+    router.push("/exercises");
+  }
 
   const profileMetrics = (() => {
     switch (mt) {
@@ -133,22 +151,42 @@ export function ExerciseDetailClient() {
     <AppShell currentPath="/exercises" title={exercise.name}>
       <div className="grid gap-6 lg:grid-cols-[1fr_0.95fr]">
         <Card>
-          <div className="grid gap-3 md:grid-cols-3">
-            {profileMetrics.map((m) => (
-              <Metric key={m.label} label={m.label} value={m.value} />
-            ))}
+          <div className="mb-4 flex items-center justify-between">
+            <p className="text-xs uppercase tracking-[0.22em] text-[#bbb]">Exercise profile</p>
+            <div className="flex items-center gap-2">
+              {saveStatus && <span className="text-xs text-emerald-400">{saveStatus}</span>}
+              <button
+                onClick={() => setEditing((e) => !e)}
+                aria-label={editing ? "Cancel edit" : "Edit exercise"}
+                className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 text-[#999] transition hover:border-white/20 hover:text-white"
+              >
+                {editing ? <X className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
+              </button>
+            </div>
           </div>
 
-          <div className="mt-5 rounded-[24px] border border-white/8 bg-[#161616] p-4">
-            <p className="text-xs text-[#bbb]">
-              Primary: {exercise.primaryMuscle ?? "—"} &nbsp;·&nbsp;
-              Secondary: {exercise.secondaryMuscles ?? "—"} &nbsp;·&nbsp;
-              {exercise.measurementType.replaceAll("_", " ")}
-            </p>
-            {exercise.notes && (
-              <p className="mt-2 text-sm text-[#ccc]">{exercise.notes}</p>
-            )}
-          </div>
+          {editing ? (
+            <ExerciseEditForm exercise={exercise} mt={mt} onSave={handleSaveEdit} onCancel={() => setEditing(false)} />
+          ) : (
+            <>
+              <div className="grid gap-3 md:grid-cols-3">
+                {profileMetrics.map((m) => (
+                  <Metric key={m.label} label={m.label} value={m.value} />
+                ))}
+              </div>
+
+              <div className="mt-5 rounded-[24px] border border-white/8 bg-[#161616] p-4">
+                <p className="text-xs text-[#bbb]">
+                  Primary: {exercise.primaryMuscle ?? "—"} &nbsp;·&nbsp;
+                  Secondary: {exercise.secondaryMuscles ?? "—"} &nbsp;·&nbsp;
+                  {exercise.measurementType.replaceAll("_", " ")}
+                </p>
+                {exercise.notes && (
+                  <p className="mt-2 text-sm text-[#ccc]">{exercise.notes}</p>
+                )}
+              </div>
+            </>
+          )}
 
           <div className="mt-6">
             <div className="mb-4">
@@ -163,6 +201,35 @@ export function ExerciseDetailClient() {
               secondaryLabel={analytics.secondaryLabel}
               measurementType={mt}
             />
+          </div>
+
+          <div className="mt-6 border-t border-white/6 pt-5">
+            {confirmDelete ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-[#bbb]">Delete this exercise?</span>
+                <button
+                  onClick={handleDelete}
+                  className="text-sm font-medium text-rose-400 hover:text-rose-300"
+                >
+                  Yes, delete
+                </button>
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  className="text-sm text-[#999] hover:text-white"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirmDelete(true)}
+                className="flex items-center gap-1.5 text-xs text-[#555] transition hover:text-rose-400"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Delete exercise
+              </button>
+            )}
+            <p className="mt-1.5 text-[11px] text-[#555]">Past workout data is preserved.</p>
           </div>
         </Card>
 
@@ -292,5 +359,132 @@ function Metric({
         {value ?? "—"}
       </p>
     </div>
+  );
+}
+
+function EditField({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="space-y-1.5 text-sm text-[#ccc]">
+      <span>{label}</span>
+      {children}
+    </label>
+  );
+}
+
+function ExerciseEditForm({
+  exercise,
+  mt,
+  onSave,
+  onCancel,
+}: {
+  exercise: ExerciseDto;
+  mt: string;
+  onSave: (patch: Record<string, unknown>) => void;
+  onCancel: () => void;
+}) {
+  const fieldClass = "w-full rounded-2xl border border-white/10 bg-[#0a0a0a] px-4 py-2.5 text-sm text-white outline-none";
+  const numClass = `${fieldClass} [appearance:textfield]`;
+
+  const [name, setName] = useState(exercise.name);
+  const [primaryMuscle, setPrimaryMuscle] = useState(exercise.primaryMuscle ?? "");
+  const [secondaryMuscles, setSecondaryMuscles] = useState(exercise.secondaryMuscles ?? "");
+  const [notes, setNotes] = useState(exercise.notes ?? "");
+  const [repTargetMin, setRepTargetMin] = useState(exercise.repTargetMin);
+  const [repTargetMax, setRepTargetMax] = useState(exercise.repTargetMax);
+  const [incrementStep, setIncrementStep] = useState(Number(exercise.incrementStep));
+  const [targetRirMin, setTargetRirMin] = useState(Number(exercise.targetRirMin ?? 0));
+  const [targetRirMax, setTargetRirMax] = useState(Number(exercise.targetRirMax ?? 2));
+  const [durationTargetSeconds, setDurationTargetSeconds] = useState(exercise.durationTargetSeconds ?? 30);
+  const [distanceTargetKm, setDistanceTargetKm] = useState(Number(exercise.distanceTargetKm ?? 5));
+
+  function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim()) return;
+    onSave({
+      name: name.trim(),
+      primaryMuscle: primaryMuscle.trim() || null,
+      secondaryMuscles: secondaryMuscles.trim() || null,
+      notes: notes.trim() || null,
+      ...(mt === "WEIGHT_REPS" || mt === "REPS_ONLY" ? { repTargetMin, repTargetMax } : {}),
+      ...(mt === "WEIGHT_REPS" || mt === "WEIGHT_TIME" ? { incrementStep } : {}),
+      ...(mt === "WEIGHT_REPS" ? { targetRirMin, targetRirMax } : {}),
+      ...(mt === "TIME" || mt === "WEIGHT_TIME" ? { durationTargetSeconds } : {}),
+      ...(mt === "DISTANCE_TIME" ? { distanceTargetKm } : {}),
+    });
+  }
+
+  return (
+    <form className="space-y-4" onSubmit={handleSave}>
+      <EditField label="Name">
+        <input value={name} onChange={(e) => setName(e.target.value)} className={fieldClass} maxLength={50} required />
+      </EditField>
+
+      {(mt === "WEIGHT_REPS" || mt === "REPS_ONLY") && (
+        <div className="grid grid-cols-2 gap-3">
+          <EditField label="Rep target min">
+            <input type="number" value={repTargetMin} min={1} max={50} onChange={(e) => setRepTargetMin(Number(e.target.value))} className={numClass} />
+          </EditField>
+          <EditField label="Rep target max">
+            <input type="number" value={repTargetMax} min={1} max={50} onChange={(e) => setRepTargetMax(Number(e.target.value))} className={numClass} />
+          </EditField>
+        </div>
+      )}
+
+      {(mt === "WEIGHT_REPS" || mt === "WEIGHT_TIME") && (
+        <EditField label="Increment step (kg)">
+          <input type="number" value={incrementStep} min={0.25} step={0.25} onChange={(e) => setIncrementStep(Number(e.target.value))} className={numClass} />
+        </EditField>
+      )}
+
+      {mt === "WEIGHT_REPS" && (
+        <div className="grid grid-cols-2 gap-3">
+          <EditField label="Target RIR min">
+            <input type="number" value={targetRirMin} min={0} max={5} step={0.5} onChange={(e) => setTargetRirMin(Number(e.target.value))} className={numClass} />
+          </EditField>
+          <EditField label="Target RIR max">
+            <input type="number" value={targetRirMax} min={0} max={5} step={0.5} onChange={(e) => setTargetRirMax(Number(e.target.value))} className={numClass} />
+          </EditField>
+        </div>
+      )}
+
+      {(mt === "TIME" || mt === "WEIGHT_TIME") && (
+        <EditField label="Duration target (seconds)">
+          <input type="number" value={durationTargetSeconds} min={1} onChange={(e) => setDurationTargetSeconds(Number(e.target.value))} className={numClass} />
+        </EditField>
+      )}
+
+      {mt === "DISTANCE_TIME" && (
+        <EditField label="Distance target (km)">
+          <input type="number" value={distanceTargetKm} min={0.1} step={0.5} onChange={(e) => setDistanceTargetKm(Number(e.target.value))} className={numClass} />
+        </EditField>
+      )}
+
+      <EditField label="Primary muscle">
+        <input value={primaryMuscle} onChange={(e) => setPrimaryMuscle(e.target.value)} className={fieldClass} placeholder="e.g. Chest" />
+      </EditField>
+
+      <EditField label="Secondary muscles">
+        <input value={secondaryMuscles} onChange={(e) => setSecondaryMuscles(e.target.value)} className={fieldClass} placeholder="e.g. Triceps, Shoulders" />
+      </EditField>
+
+      <EditField label="Notes">
+        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className={`${fieldClass} min-h-16`} placeholder="Execution cues, setup notes..." />
+      </EditField>
+
+      <div className="flex items-center gap-3 pt-1">
+        <button type="submit" className="flex items-center gap-1.5 rounded-2xl bg-white px-4 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-200">
+          <Check className="h-3.5 w-3.5" /> Save
+        </button>
+        <button type="button" onClick={onCancel} className="rounded-2xl border border-white/10 px-4 py-2.5 text-sm text-[#bbb] hover:text-white">
+          Cancel
+        </button>
+      </div>
+    </form>
   );
 }

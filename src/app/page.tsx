@@ -200,7 +200,7 @@ export default function Home() {
                 3. Track progress in <Link href="/analytics" className="underline text-[#bbb]">Stats</Link>
               </p>
             </div>
-            <button onClick={dismissOnboarding} aria-label="Dismiss" className="flex h-6 w-6 items-center justify-center text-[#999] hover:text-white">
+            <button onClick={dismissOnboarding} aria-label="Dismiss" className="flex h-10 w-10 items-center justify-center text-[#999] hover:text-white">
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -221,10 +221,14 @@ export default function Home() {
           {/* Date label */}
           <div className="mb-3 flex items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#999]">
-              {isToday ? "Today" : selectedDateLabel}
+              {isToday
+                ? "Today"
+                : selectedDate.toLocaleDateString("en-MY", { weekday: "long" })}
             </p>
             {!isToday && (
-              <p className="text-[11px] text-[#bbb]">{selectedDateLabel}</p>
+              <p className="text-[11px] text-[#bbb]">
+                {selectedDate.toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" })}
+              </p>
             )}
           </div>
 
@@ -297,7 +301,7 @@ export default function Home() {
           {/* Future day */}
           {isFutureDay && dayWorkouts.length === 0 && (
             <div className="rounded-2xl border border-white/6 px-4 py-5">
-              <p className="text-center text-sm text-[#bbb]">Future date — come back then.</p>
+              <p className="text-center text-sm text-[#bbb]">Select today or a past date to log a workout.</p>
             </div>
           )}
 
